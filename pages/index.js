@@ -1,4 +1,4 @@
-import { getSession, useSession, signIn, signOut } from "next-auth/react";
+import { useSession, signIn, signOut } from "next-auth/react";
 import useSWR from "swr";
 
 const fetcher = url => fetch(url).then(res => res.json());
