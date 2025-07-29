@@ -5,6 +5,9 @@ const COINGECKO_API = 'https://api.coingecko.com/api/v3';
 async function getSolanaPriceData() {
   const res = await fetch(`${COINGECKO_API}/coins/solana/market_chart?vs_currency=usd&days=14`);
   const json = await res.json();
+if (!json || !Array.isArray(json.prices)) {
+  return res.status(500).json({ error: "Invalid or missing 'prices' array in response" });
+}
   const prices = json.prices.map(p => p[1]);
   const peak = Math.max(...prices);
   const current = prices[prices.length - 1];
