@@ -5,7 +5,7 @@ const fetcher = url => fetch(url).then(res => res.json());
 
 export default function Home() {
 //  const { data: session, status } = useSession();
-const { data: session } = useSession() ?? {};
+const { data: session, status } = useSession() ?? {};
   const { data, error } = useSWR('/api/indicators', fetcher);
 
   if (status === "loading") return <p>Loading session...</p>;
