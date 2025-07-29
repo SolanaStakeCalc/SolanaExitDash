@@ -1,0 +1,17 @@
+{
+  "name": "solana-exit-dashboard-final-with-divergence",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "swr": "latest",
+    "next-auth": "latest",
+    "node-fetch": "^2.6.1"
+  }
+}
