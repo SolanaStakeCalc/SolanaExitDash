@@ -3,7 +3,7 @@ const fetch = require('node-fetch');
 const COINGECKO_API = 'https://api.coingecko.com/api/v3';
 
 async function getSolanaPriceData() {
-  const res = await fetch(\`\${COINGECKO_API}/coins/solana/market_chart?vs_currency=usd&days=14\`);
+  const res = await fetch(`${COINGECKO_API}/coins/solana/market_chart?vs_currency=usd&days=14`);
   const json = await res.json();
   const prices = json.prices.map(p => p[1]);
   const peak = Math.max(...prices);
@@ -24,7 +24,7 @@ function calculateRSI(closes) {
 }
 
 async function checkWeeklyRSIDivergence() {
-  const res = await fetch(\`\${COINGECKO_API}/coins/solana/market_chart?vs_currency=usd&days=90\`);
+  const res = await fetch(`${COINGECKO_API}/coins/solana/market_chart?vs_currency=usd&days=90`);
   const json = await res.json();
   const prices = json.prices.map(p => p[1]);
   const weekly = prices.filter((_, i) => i % 7 === 0);
