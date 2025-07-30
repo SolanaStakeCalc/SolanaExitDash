@@ -1,24 +1,9 @@
-import { useSession, signIn, signOut } from "next-auth/react";
 import useSWR from "swr";
 
 const fetcher = url => fetch(url).then(res => res.json());
 
 export default function Home() {
-  const { data: session, status } = useSession();
   const { data, error } = useSWR('/api/indicators', fetcher);
-
-  if (status === "loading") return <p>Loading session...</p>;
-  if (!session) {
-    return (
-      <div style={{ fontFamily: 'Arial', padding: '2rem', textAlign: 'center' }}>
-        <h1>🔐 Welcome to the Solana Exit Dashboard</h1>
-        <p>You must be logged in with GitHub to view this dashboard.</p>
-        <button onClick={() => signIn('github')} style={{ padding: '10px 20px', fontSize: '16px' }}>
-          Login with GitHub
-        </button>
-      </div>
-    );
-  }
 
   if (error) return <p>Failed to load indicators.</p>;
   if (!data) return <p>Loading dashboard...</p>;
@@ -29,10 +14,7 @@ export default function Home() {
 
   return (
     <div style={{ fontFamily: 'Arial', padding: '2rem', maxWidth: 800, margin: 'auto' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <h1>📈 Solana Exit Timing Dashboard</h1>
-        <button onClick={() => signOut()} style={{ height: '40px' }}>Logout</button>
-      </div>
+      <h1>📈 Solana Exit Timing Dashboard</h1>
       <h2 style={{ color: allConfirmed ? 'green' : 'red' }}>
         {allConfirmed ? '✅ PHASE 2 CONFIRMED' : '❌ Phase 2 Not Fully Confirmed'}
       </h2>
