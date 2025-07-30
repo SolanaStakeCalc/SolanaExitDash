@@ -1,21 +1,24 @@
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
 const COINGECKO_API = 'https://api.coingecko.com/api/v3';
 
 async function getSolanaPriceData() {
-  const res = await fetch(`${COINGECKO_API}/coins/solana/market_chart?vs_currency=usd&days=14`);
-  const json = await res.json();
-if (!json || !Array.isArray(json.prices)) {
-  return res.status(500).json({ error: "Invalid or missing 'prices' array in response" });
-}
-  const prices = json.prices.map(p => p[1]);
-  const peak = Math.max(...prices);
-  const current = prices[prices.length - 1];
-  const drop = ((peak - current) / peak) * 100;
-  return { drop: Math.round(drop), prices };
+  try {
+    const res = await fetch(`${COINGECKO_API}/coins/solana/market_chart?vs_currency=usd&days=14`);
+    const json = await res.json();
+    if (!json || !json.prices) return { drop: 0, prices: [] };
+    const prices = json.prices.map(p => p[1]);
+    const peak = Math.max(...prices);
+    const current = prices[prices.length - 1];
+    const drop = ((peak - current) / peak) * 100;
+    return { drop: Math.round(drop), prices };
+  } catch (err) {
+    return { drop: 0, prices: [] };
+  }
 }
 
 function calculateRSI(closes) {
+  if (!closes || closes.length < 2) return 50;
   let gains = 0, losses = 0;
   for (let i = 1; i < closes.length; i++) {
     const diff = closes[i] - closes[i - 1];
@@ -27,15 +30,18 @@ function calculateRSI(closes) {
 }
 
 async function checkWeeklyRSIDivergence() {
-  const res = await fetch(`${COINGECKO_API}/coins/solana/market_chart?vs_currency=usd&days=90`);
-  const json = await res.json();
-  const prices = json.prices.map(p => p[1]);
-  const weekly = prices.filter((_, i) => i % 7 === 0);
-
-  const prevRSI = calculateRSI(weekly.slice(0, weekly.length - 1));
-  const latestRSI = calculateRSI(weekly.slice(-7));
-
-  return { prevRSI, latestRSI, divergence: prevRSI >= 80 && latestRSI < prevRSI };
+  try {
+    const res = await fetch(`${COINGECKO_API}/coins/solana/market_chart?vs_currency=usd&days=90`);
+    const json = await res.json();
+    if (!json || !json.prices) return { divergence: false, prevRSI: 0, latestRSI: 0 };
+    const prices = json.prices.map(p => p[1]);
+    const weekly = prices.filter((_, i) => i % 7 === 0);
+    const prevRSI = calculateRSI(weekly.slice(0, weekly.length - 1));
+    const latestRSI = calculateRSI(weekly.slice(-7));
+    return { prevRSI, latestRSI, divergence: prevRSI >= 80 && latestRSI < prevRSI };
+  } catch (err) {
+    return { divergence: false, prevRSI: 0, latestRSI: 0 };
+  }
 }
 
 export default async function handler(req, res) {
